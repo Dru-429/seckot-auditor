@@ -34,6 +34,7 @@ exports.createScan = async (req, res) => {
     // Trigger scan asynchronously
     triggerScanAsync(scan._id, githubUrl);
   } catch (error) {
+    console.error('Scan creation error:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating scan',
@@ -58,7 +59,7 @@ async function triggerScanAsync(scanId, githubUrl) {
     // Extract and summarize vulnerabilities
     const vulnerabilities = (scanResult.rawReport.vulnerabilities || []).map(
       (vuln) => ({
-        type: vuln.type,
+        vulnerabilityType: vuln.type,
         severity: vuln.severity,
         filePath: vuln.file,
         lineNumber: vuln.line,
@@ -115,9 +116,12 @@ exports.getScanById = async (req, res) => {
     const { scanId } = req.params;
     const userId = req.user.id;
 
+    console.log('Fetching scan:', { scanId, userId });
+
     const scan = await Scan.findOne({ _id: scanId, userId });
 
     if (!scan) {
+      console.log('Scan not found:', { scanId, userId });
       return res.status(404).json({ message: 'Scan not found' });
     }
 
@@ -126,6 +130,7 @@ exports.getScanById = async (req, res) => {
       scan,
     });
   } catch (error) {
+    console.error('Error fetching scan:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching scan',

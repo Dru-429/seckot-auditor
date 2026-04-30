@@ -20,25 +20,22 @@ const scanSchema = new mongoose.Schema(
       type: Number,
       min: 0,
       max: 100,
-      required: [true, 'Security score is required'],
+      default: null,
     },
     status: {
       type: String,
       enum: ['pending', 'scanning', 'completed', 'failed'],
       default: 'pending',
     },
-    vulnerabilities: {
-      type: [
-        {
-          type: String,
-          severity: String,
-          filePath: String,
-          lineNumber: Number,
-          description: String,
-        },
-      ],
-      default: [],
-    },
+    vulnerabilities: [
+      {
+        vulnerabilityType: String,
+        severity: String,
+        filePath: String,
+        lineNumber: Number,
+        description: String,
+      },
+    ],
     summary: {
       critical: Number,
       high: Number,

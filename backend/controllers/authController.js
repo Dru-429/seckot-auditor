@@ -44,6 +44,7 @@ exports.signup = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error('Signup error:', error); // Add detailed logging
     res.status(500).json({
       success: false,
       message: 'Error during signup',

@@ -35,7 +35,7 @@ export const DeveloperView = ({ scan }) => {
               className="p-4 border border-slate-200 rounded-lg bg-slate-50"
             >
               <div className="flex justify-between items-start mb-2">
-                <h4 className="font-semibold text-slate-900">{vuln.type}</h4>
+                <h4 className="font-semibold text-slate-900">{vuln.vulnerabilityType}</h4>
                 <Badge severity={vuln.severity}>{vuln.severity}</Badge>
               </div>
               <div className="space-y-1 text-sm text-slate-600 font-mono">
@@ -116,7 +116,7 @@ export const ClientView = ({ scan }) => {
             >
               <div className="flex justify-between items-start mb-2">
                 <h4 className="font-semibold text-slate-900">
-                  {translateVulnerability(vuln.type)}
+                  {translateVulnerability(vuln.vulnerabilityType)}
                 </h4>
                 <Badge severity={vuln.severity}>{vuln.severity}</Badge>
               </div>
@@ -145,18 +145,51 @@ export const ClientView = ({ scan }) => {
 
 export const ResultsPage = ({ scan, userRole }) => {
   const id = `results-${scan._id}`;
+  const scoreGrade = getScoreGrade(scan.score || 0);
+  const scanDurationMinutes = Math.round((scan.scanDuration || 0) / 1000 / 60);
 
   return (
     <div id={id} className="bg-white p-8">
+      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900 mb-2">
-          {scan.githubUrl}
+          Security Audit Report
         </h1>
         <p className="text-sm text-slate-600">
-          Scanned on {new Date(scan.createdAt).toLocaleDateString()}
+          Repository: {scan.githubUrl}
+        </p>
+        <p className="text-sm text-slate-600">
+          Scanned on {new Date(scan.createdAt).toLocaleDateString()} • {scan.status === 'completed' && `${scanDurationMinutes} min scan`}
         </p>
       </div>
 
+      {/* Score Summary Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-lg p-8 shadow-lg"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Overall Security Score</h2>
+            <div className="flex items-baseline gap-3">
+              <div className="text-6xl font-bold">{scan.score || 'N/A'}</div>
+              <div className="text-2xl font-semibold">{scoreGrade.grade}</div>
+            </div>
+            <p className="text-slate-300 text-sm mt-2">{scoreGrade.label}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {Object.entries(scan.summary || {}).map(([severity, count]) => (
+              <div key={severity} className="bg-white bg-opacity-10 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold">{count}</div>
+                <div className="text-xs text-slate-300 capitalize">{severity}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Content based on role */}
       {userRole === 'developer' ? (
         <DeveloperView scan={scan} />
       ) : (
