@@ -1,22 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../components/UI';
 import { ResultsPage } from '../components/ResultsView';
 import { useScan } from '../hooks/useScan';
 import { generatePDFReport } from '../utils/helpers';
 
 
-export const Results = ({ scanId, user, onBack }) => {
+export const Results = ({ user, onBack }) => {
   const navigate = useNavigate();
-  const { currentScan, loading, getScanById } = useScan();
+  const { scanId } = useParams();
+  const { currentScan, loading, error, getScanById } = useScan();
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   useEffect(() => {
     if (scanId) {
+      console.log('Fetching scan with ID:', scanId);
       getScanById(scanId);
     }
-  }, [scanId]);
+  }, [scanId, getScanById]);
+
+  // Poll for scan updates if still scanning
+  useEffect(() => {
+    if (currentScan && currentScan.status === 'scanning') {
+      const pollInterval = setInterval(() => {
+        console.log('Polling for scan updates...');
+        getScanById(scanId);
+      }, 2000);
+      return () => clearInterval(pollInterval);
+    }
+  }, [currentScan, scanId, getScanById]);
 
   const handleDownloadPDF = async () => {
     try {
@@ -44,7 +57,12 @@ export const Results = ({ scanId, user, onBack }) => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <p className="text-slate-600 mb-4">Scan not found</p>
+          <p className="text-slate-600 mb-4">
+            {error || 'Scan not found'}
+          </p>
+          <p className="text-sm text-slate-500 mb-6">
+            Scan ID: {scanId}
+          </p>
           <Button onClick={() => navigate('/dashboard')}>Back to Dashboard</Button>
         </div>
       </div>

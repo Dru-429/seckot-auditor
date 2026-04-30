@@ -55,7 +55,9 @@ export const useScan = () => {
       setCurrentScan(response.data.scan);
       return response.data.scan;
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch scan');
+      const errorMsg = err.response?.data?.message || 'Failed to fetch scan';
+      console.error('Error fetching scan:', errorMsg, err);
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

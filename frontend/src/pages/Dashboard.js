@@ -78,7 +78,7 @@ export const Dashboard = ({ user, onLogout }) => {
             <p className="text-sm font-semibold">{user?.email}</p>
             <p className="text-xs text-slate-400 capitalize">{user?.role}</p>
           </div>
-          <Button variant="outline" onClick={onLogout} className="w-full text-sm">
+          <Button className="w-full text-sm bg-zinc-100 text-zinc-900 hover:bg-zinc-800 hover:text-zinc-100" onClick={onLogout}>
             Logout
           </Button>
         </div>
