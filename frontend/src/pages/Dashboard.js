@@ -80,10 +80,10 @@ export const Dashboard = ({ user, onLogout }) => {
           <div className="flex items-center gap-3">
             {/* <Avatar name={user?.email || 'User'} size="md" className='' /> */}
             <div>
-              <p className="text-sm font-semibold text-white truncate">{user?.email}</p>
+              <p className="text-sm font-semibold text-white truncate">{user?.email || 'No email available'}</p>
               <div className="mt-1 flex items-center gap-2">
                 <Badge severity="success" className="rounded-full px-2 py-0.5 text-[10px] uppercase tracking-[0.12em]">
-                  {user?.role || 'Developer'}
+                  {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Guest'}
                 </Badge>
               </div>
             </div>

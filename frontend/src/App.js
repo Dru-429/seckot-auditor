@@ -12,6 +12,13 @@ function AppContent() {
   const [isLoading, setIsLoading] = useState(true);
   const { user, getCurrentUser, logout } = useAuth();
 
+  const handleLoginSuccess = async () => {
+    const currentUser = await getCurrentUser();
+    if (currentUser) {
+      setIsAuthenticated(true);
+    }
+  };
+
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
@@ -50,7 +57,7 @@ function AppContent() {
               <Navigate to="/dashboard" />
             ) : (
               <Auth
-                onLoginSuccess={() => setIsAuthenticated(true)}
+                onLoginSuccess={handleLoginSuccess}
               />
             )
           }
