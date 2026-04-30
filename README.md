@@ -170,49 +170,6 @@ secko-auditor/
 | GET | `/api/auth/me` | Get current user (requires auth) |
 | PUT | `/api/auth/profile` | Update user profile (requires auth) |
 
-**Request/Response Examples:**
-
-**Sign Up**
-```bash
-POST /api/auth/signup
-{
-  "email": "user@example.com",
-  "password": "securePassword123",
-  "role": "developer"  # or "client"
-}
-
-Response:
-{
-  "success": true,
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "user": {
-    "id": "user_id",
-    "email": "user@example.com",
-    "role": "developer"
-  }
-}
-```
-
-**Login**
-```bash
-POST /api/auth/login
-{
-  "email": "user@example.com",
-  "password": "securePassword123"
-}
-
-Response:
-{
-  "success": true,
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "user": {
-    "id": "user_id",
-    "email": "user@example.com",
-    "role": "developer",
-    "profileDetails": { ... }
-  }
-}
-```
 
 ### Scan Endpoints
 
@@ -223,87 +180,6 @@ Response:
 | GET | `/api/scan/:scanId` | Get specific scan (requires auth) |
 | GET | `/api/scan/:scanId/status` | Get scan status (requires auth) |
 | DELETE | `/api/scan/:scanId` | Delete scan (requires auth) |
-
-**Request/Response Examples:**
-
-**Create Scan**
-```bash
-POST /api/scan
-Authorization: Bearer {token}
-{
-  "githubUrl": "https://github.com/username/repository"
-}
-
-Response:
-{
-  "success": true,
-  "message": "Scan initiated",
-  "scan": {
-    "_id": "scan_id",
-    "userId": "user_id",
-    "githubUrl": "https://github.com/username/repository",
-    "status": "scanning",
-    "createdAt": "2024-01-15T10:30:00Z"
-  }
-}
-```
-
-**Get Scan Results**
-```bash
-GET /api/scan/scan_id
-Authorization: Bearer {token}
-
-Response:
-{
-  "success": true,
-  "scan": {
-    "_id": "scan_id",
-    "userId": "user_id",
-    "githubUrl": "https://github.com/username/repository",
-    "score": 72,
-    "status": "completed",
-    "vulnerabilities": [
-      {
-        "type": "SQL Injection",
-        "severity": "critical",
-        "filePath": "src/api/users.js",
-        "lineNumber": 45,
-        "description": "User input not properly sanitized"
-      },
-      ...
-    ],
-    "summary": {
-      "critical": 2,
-      "high": 2,
-      "medium": 2,
-      "low": 1,
-      "info": 0
-    },
-    "createdAt": "2024-01-15T10:30:00Z"
-  }
-}
-```
-
-## 🔐 Security Features
-
-1. **JWT Authentication**
-   - Secure token-based authentication
-   - Automatic token refresh on login
-   - Token stored in localStorage
-
-2. **Password Security**
-   - Bcrypt hashing with salt rounds
-   - Minimum 6 character requirement
-   - Never sent to frontend
-
-3. **CORS Protection**
-   - Configured for specific frontend origin
-   - Credentials enabled for secure cookies
-
-4. **Data Validation**
-   - GitHub URL format validation
-   - Input sanitization on both client and server
-   - Express validator for server-side checks
 
 ## 📊 Scoring Algorithm
 
