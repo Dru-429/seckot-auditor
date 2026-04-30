@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Badge, ProgressBar } from './UI';
-import { translateVulnerability, getSeverityColor, getSeverityTextColor, getScoreGrade } from '../utils/helpers';
+import { Badge } from './UI';
+import { translateVulnerability, getSeverityColor, getScoreGrade } from '../utils/helpers';
 
 export const DeveloperView = ({ scan }) => {
   return (

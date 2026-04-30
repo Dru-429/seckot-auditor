@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Button } from './components/UI';
-import { ResultsPage } from './components/ResultsView';
-import { generatePDFReport } from './utils/helpers';
-import { useScan } from './hooks/useScan';
+import { Button } from '../components/UI';
+import { ResultsPage } from '../components/ResultsView';
+import { useScan } from '../hooks/useScan';
+import { generatePDFReport } from '../utils/helpers';
+
 
 export const Results = ({ scanId, user, onBack }) => {
   const navigate = useNavigate();

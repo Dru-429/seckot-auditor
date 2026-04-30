@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Button, Input, Card } from './UI';
+import { Button, Input } from './UI';
 
 export const LoginForm = ({ onSubmit, loading, error }) => {
   const [email, setEmail] = React.useState('');

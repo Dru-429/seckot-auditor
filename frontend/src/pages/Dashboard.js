@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card } from './components/UI';
-import { ScanInput, ScanningAnimation, ScanHistoryList } from './components/ScanComponents';
-import { useScan } from './hooks/useScan';
+// import { Button } from '../components/UI';
+import { Button, Card } from '../components/UI';
+// import { ScanInput } from '../components/ScanComponents';
+import { ScanInput, ScanningAnimation, ScanHistoryList } from '../components/ScanComponents';
+import { useScan } from '../hooks/useScan';
 
 export const Dashboard = ({ user, onLogout }) => {
   const navigate = useNavigate();

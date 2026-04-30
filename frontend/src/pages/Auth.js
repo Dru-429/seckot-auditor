@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button, Card } from './components/UI';
-import { LoginForm, SignupForm, RoleSelector } from './components/AuthForms';
-import { useAuth } from './hooks/useAuth';
+import { Button, Card } from '../components/UI';
+import { LoginForm, RoleSelector, SignupForm } from '../components/AuthForms';
+import { useAuth } from '../hooks/useAuth';
 
 export const Auth = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
