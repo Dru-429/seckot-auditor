@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-// import { Button } from '../components/UI';
-import { Button, Card } from '../components/UI';
-// import { ScanInput } from '../components/ScanComponents';
+import { LayoutDashboard, PlusCircle } from 'lucide-react';
+import { Button, Card, Avatar, Badge } from '../components/UI';
 import { ScanInput, ScanningAnimation, ScanHistoryList } from '../components/ScanComponents';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { useTheme } from '../context/ThemeContext';
@@ -46,44 +45,52 @@ export const Dashboard = ({ user, onLogout }) => {
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Sidebar */}
       <motion.aside
-        className={`fixed left-0 top-0 w-64 h-screen ${isDark ? 'bg-slate-800' : 'bg-slate-900'} text-white p-6 shadow-lg`}
-        initial={{ x: -256 }}
+        className="flex flex-col justify-start relative w-full md:fixed md:left-0 md:top-0 md:w-72 h-auto md:h-screen bg-slate-950 text-white p-5 md:p-6 shadow-2xl z-20"
+        initial={{ x: -288 }}
         animate={{ x: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold">Secko Auditor</h1>
-          <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>Security Scanning</p>
+        <div className="mb-10">
+          <h1 className="text-2xl font-semibold tracking-tight">Secko Auditor</h1>
+          <p className="text-sm text-slate-400 mt-1">Security scanning hub</p>
         </div>
 
-        <nav className="space-y-2 mb-8">
-          <a
-            href="/dashboard"
-            className={`block px-4 py-2 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-800'}`}
+        <nav className="space-y-2 mb-10">
+          <button
+            type="button"
+            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
           >
+            <LayoutDashboard className="h-5 w-5" />
             Dashboard
-          </a>
-          <a
-            href="#new-scan"
+          </button>
+          <button
+            type="button"
             onClick={() => setShowNewScan(!showNewScan)}
-            className={`block px-4 py-2 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-800'}`}
+            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
           >
+            <PlusCircle className="h-5 w-5" />
             New Scan
-          </a>
+          </button>
         </nav>
 
-        <div className={`mt-auto pt-6 border-t ${isDark ? 'border-slate-700' : 'border-slate-700'}`}>
-          <div className="mb-4">
-            <p className="text-xs text-slate-400">Logged in as</p>
-            <p className="text-sm font-semibold">{user?.email}</p>
-            <p className="text-xs text-slate-400 capitalize">{user?.role}</p>
+        <div className="mt-auto rounded-3xl border border-white/10 bg-slate-900 p-4">
+          <div className="flex items-center gap-3">
+            {/* <Avatar name={user?.email || 'User'} size="md" className='' /> */}
+            <div>
+              <p className="text-sm font-semibold text-white truncate">{user?.email}</p>
+              <div className="mt-1 flex items-center gap-2">
+                <Badge severity="success" className="rounded-full px-2 py-0.5 text-[10px] uppercase tracking-[0.12em]">
+                  {user?.role || 'Developer'}
+                </Badge>
+              </div>
+            </div>
           </div>
-          <div className="flex gap-2">
+          <div className="mt-4 flex gap-2">
             <ThemeToggle />
-            <Button variant="outline" onClick={onLogout} className="flex-1 text-sm">
+            <Button onClick={onLogout} className="border  flex-1 text-sm">
               Logout
             </Button>
           </div>
@@ -91,32 +98,54 @@ export const Dashboard = ({ user, onLogout }) => {
       </motion.aside>
 
       {/* Main Content */}
-      <main className={`ml-64 p-8 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
-        <div className="max-w-4xl">
+      <main className="md:ml-72 min-h-screen p-5 md:p-8">
+        <div className="max-w-6xl mx-auto space-y-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="flex flex-col gap-6"
           >
-            <h2 className={`text-3xl font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'} mb-2`}>Dashboard</h2>
-            <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>Welcome back, {user?.email}!</p>
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm text-slate-500">Home / Dashboard</p>
+                <h2 className="text-4xl font-semibold tracking-tight text-slate-950">Dashboard</h2>
+                <p className="mt-1 text-sm text-slate-600">Monitor recent repository scans and move quickly from detection to action.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button onClick={() => setShowNewScan(!showNewScan)} className="inline-flex items-center gap-2" size="lg">
+                  <PlusCircle className="h-4 w-4" />
+                  New Scan
+                </Button>
+              </div>
+            </div>
+
+            {showNewScan && (
+              <Card className="bg-white border-slate-200 shadow-sm">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-950">Start a new scan</h3>
+                    <p className="text-sm text-slate-500">Paste the GitHub URL to run a fresh security audit.</p>
+                  </div>
+                </div>
+                <div className="mt-6">
+                  {currentScan?.status === 'scanning' ? (
+                    <ScanningAnimation />
+                  ) : (
+                    <ScanInput onScanSubmit={handleScanSubmit} />
+                  )}
+                </div>
+              </Card>
+            )}
           </motion.div>
 
-          {/* New Scan Section */}
-          {showNewScan && (
-            <Card className="mb-8">
-              <h3 className={`text-lg font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'} mb-4`}>New Scan</h3>
-              {currentScan?.status === 'scanning' ? (
-                <ScanningAnimation />
-              ) : (
-                <ScanInput onScanSubmit={handleScanSubmit} />
-              )}
-            </Card>
-          )}
-
-          {/* Scan History */}
-          <Card>
-            <h3 className={`text-lg font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'} mb-4`}>Recent Scans</h3>
+          <Card className="bg-white border-slate-200 shadow-sm">
+            <div className="flex items-center justify-between gap-4 mb-6">
+              <div>
+                <h3 className="text-xl font-semibold text-slate-950">Recent scans</h3>
+                <p className="text-sm text-slate-500">Latest repositories you’ve analyzed with Secko Auditor.</p>
+              </div>
+            </div>
             <ScanHistoryList
               scans={scans}
               onSelectScan={handleViewScan}

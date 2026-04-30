@@ -102,6 +102,9 @@ export const Badge = ({ children, severity = 'info', className = '' }) => {
     medium: isDark ? 'bg-yellow-900 text-yellow-200' : 'bg-yellow-100 text-yellow-800',
     low: isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800',
     info: isDark ? 'bg-slate-700 text-slate-200' : 'bg-slate-100 text-slate-800',
+    success: isDark ? 'bg-emerald-900 text-emerald-200' : 'bg-emerald-100 text-emerald-800',
+    warning: isDark ? 'bg-amber-900 text-amber-200' : 'bg-amber-100 text-amber-800',
+    danger: isDark ? 'bg-rose-900 text-rose-200' : 'bg-rose-100 text-rose-800',
   };
 
   return (
@@ -112,6 +115,68 @@ export const Badge = ({ children, severity = 'info', className = '' }) => {
     >
       {children}
     </span>
+  );
+};
+
+export const Avatar = ({ name = '', src, size = 'md', className = '' }) => {
+  const initials = name
+    .split(' ')
+    .map((part) => part[0]?.toUpperCase())
+    .slice(0, 2)
+    .join('');
+
+  const sizes = {
+    sm: 'w-10 h-10 text-sm',
+    md: 'w-22 h-12 text-base',
+    lg: 'w-14 h-14 text-lg',
+  };
+
+  return (
+    <div className={`relative inline-flex items-center justify-center rounded-full bg-slate-200 text-slate-700 ${sizes[size]} ${className}`}>
+      {src ? (
+        <img src={src} alt={name} className="h-full w-full rounded-full object-cover" />
+      ) : (
+        <span className="font-semibold">{initials || 'U'}</span>
+      )}
+    </div>
+  );
+};
+
+export const CircularProgress = ({ value = 0, size = 48 }) => {
+  const { isDark } = useTheme();
+  const strokeWidth = 6;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const progress = Math.max(0, Math.min(100, value));
+  const offset = circumference - (progress / 100) * circumference;
+  const trackColor = isDark ? '#1f2937' : '#e2e8f0';
+  const progressColor = progress >= 90 ? '#16a34a' : progress >= 70 ? '#ca8a04' : '#dc2626';
+
+  return (
+    <div className="inline-flex items-center justify-center"> 
+      <svg width={size} height={size} className="transform -rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={trackColor}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={progressColor}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+        />
+      </svg>
+      <span className={`absolute text-xs font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{Math.round(progress)}</span>
+    </div>
   );
 };
 

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button, Input, LoadingSpinner } from './UI';
+import { MoreHorizontal } from 'lucide-react';
+import { Button, Input, LoadingSpinner, Badge, CircularProgress } from './UI';
 import { useTheme } from '../context/ThemeContext';
 import { useScan } from '../hooks/useScan';
+import { useNavigate } from 'react-router-dom';
 
 export const ScanInput = ({ onScanSubmit }) => {
   const [githubUrl, setGithubUrl] = useState('');
@@ -90,8 +92,32 @@ export const ScanningAnimation = () => {
   );
 };
 
+const getRepoName = (githubUrl) => {
+  const match = githubUrl.match(/github\.com\/([^\/]+\/[^\/]+)/);
+  return match ? match[1] : githubUrl;
+};
+
+const getStatusBadge = (status) => {
+  if (status === 'completed') return <Badge severity="success">Completed</Badge>;
+  if (status === 'failed') return <Badge severity="danger">Failed</Badge>;
+  return <Badge severity="warning">Pending</Badge>;
+};
+
+const getScoreValue = (score) => {
+  if (score >= 90) return 'success';
+  if (score >= 70) return 'warning';
+  return 'danger';
+};
+
 export const ScanHistoryList = ({ scans, onSelectScan, onDeleteScan, loading }) => {
   const { isDark } = useTheme();
+  const [openRow, setOpenRow] = useState(null);
+  const navigate = useNavigate();
+
+  const handleActionToggle = (event, id) => {
+    event.stopPropagation();
+    setOpenRow(openRow === id ? null : id);
+  };
 
   if (loading) {
     return (
@@ -114,55 +140,81 @@ export const ScanHistoryList = ({ scans, onSelectScan, onDeleteScan, loading }) 
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="space-y-3"
-    >
-      {scans.map((scan, idx) => (
-        <motion.div
-          key={scan._id}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: idx * 0.1 }}
-          className={`p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer ${isDark ? 'border-slate-700 hover:bg-slate-800' : 'border-slate-200 hover:bg-slate-50'}`}
-          onClick={() => onSelectScan(scan)}
-        >
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
-              <h4 className={`font-semibold truncate ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{scan.githubUrl}</h4>
-              <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                {new Date(scan.createdAt).toLocaleDateString()}
-              </p>
+    <div className="space-y-4">
+      {scans.map((scan, idx) => {
+        const repoName = getRepoName(scan.githubUrl);
+        const status = scan.status || 'pending';
+        const scoreValue = scan.score || 0;
+        const statusBadge = getStatusBadge(status);
+
+        return (
+          <motion.div
+            key={scan._id}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.08 }}
+            className={`group relative rounded-3xl border bg-white p-5 shadow-sm transition hover:shadow-md ${isDark ? 'border-slate-700 bg-slate-900' : 'border-slate-200'}`}
+            onClick={() => onSelectScan(scan)}
+          >
+            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+              <div className="min-w-0 flex-1">
+                <p className={`text-sm font-semibold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{repoName}</p>
+                <p className="mt-1 text-sm text-slate-500 truncate">{scan.githubUrl}</p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                {status === 'scanning' ? (
+                  <div className="animate-pulse rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700">
+                    Pending
+                  </div>
+                ) : statusBadge}
+                <div className="flex items-center gap-3">
+                  <CircularProgress value={scoreValue} size={44} />
+                  <p className={`text-sm font-semibold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>Score</p>
+                </div>
+              </div>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={(e) => handleActionToggle(e, scan._id)}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-slate-50"
+                >
+                  <MoreHorizontal className="h-5 w-5" />
+                </button>
+                {openRow === scan._id && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="absolute right-0 top-12 z-10 w-40 rounded-2xl border border-slate-200 bg-white py-2 shadow-lg"
+                  >
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenRow(null);
+                        onDeleteScan(scan._id);
+                      }}
+                      className="w-full px-4 py-3 text-left text-sm text-rose-600 transition hover:bg-slate-50"
+                    >
+                      Delete Scan
+                    </button>
+                  </motion.div>
+                )}
+              </div>
             </div>
-            <div className="text-right">
-              <div className={`text-2xl font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{scan.score || '-'}</div>
-              <span
-                className={`text-xs font-semibold ${
-                  scan.status === 'completed'
-                    ? isDark ? 'text-green-400' : 'text-green-600'
-                    : scan.status === 'failed'
-                    ? isDark ? 'text-red-400' : 'text-red-600'
-                    : isDark ? 'text-yellow-400' : 'text-yellow-600'
-                }`}
-              >
-                {scan.status}
-              </span>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl bg-slate-50 p-3 text-sm text-slate-600">
+                <span className="font-semibold text-slate-900">Scanned:</span> {new Date(scan.createdAt).toLocaleDateString()}
+              </div>
+              <div className="rounded-2xl bg-slate-50 p-3 text-sm text-slate-600">
+                <span className="font-semibold text-slate-900">Vulnerabilities:</span> {scan.summary ? Object.values(scan.summary).reduce((sum, count) => sum + count, 0) : 0}
+              </div>
             </div>
-          </div>
-          {scan.status === 'completed' && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDeleteScan(scan._id);
-              }}
-              className={`mt-3 text-xs ${isDark ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-800'}`}
-            >
-              Delete Scan
-            </button>
-          )}
-        </motion.div>
-      ))}
-    </motion.div>
+          </motion.div>
+        );
+      })}
+    </div>
   );
 };
