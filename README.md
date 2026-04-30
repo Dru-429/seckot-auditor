@@ -284,34 +284,6 @@ Response:
 }
 ```
 
-## 🎨 UI/UX Design
-
-### Theme & Colors
-- **Primary**: Slate-900 (#0f172a) - Dark background for sidebars
-- **Background**: White (#ffffff) - Clean, minimal aesthetic
-- **Borders**: Slate-200 (#e2e8f0) - Subtle, professional borders
-- **Accents**: Slate-50 (#f8fafc) - Hover states and sections
-
-### Component System
-- Built with Shadcn/UI principles
-- Tailwind CSS for styling
-- Framer Motion for animations
-- Custom components in `src/components/UI.js`
-
-### User Roles
-
-**Developer Role:**
-- View technical vulnerability details
-- See file paths and line numbers
-- Access raw scan report (JSON)
-- Technical terminology displayed
-
-**Client Role:**
-- Plain English vulnerability descriptions
-- High-level security summary
-- Visual progress indicators
-- Simplified terminology (e.g., "Database Entry Protection" instead of "SQL Injection")
-
 ## 🔐 Security Features
 
 1. **JWT Authentication**
