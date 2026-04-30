@@ -78,95 +78,130 @@ class ArmoriqService {
     return new Promise((resolve) => {
       // Simulate network delay
       setTimeout(() => {
-        const vulnerabilities = [
-          {
-            id: 'VULN_001',
-            type: 'SQL Injection',
-            severity: 'critical',
-            file: 'src/api/users.js',
-            line: 45,
-            description: 'User input not properly sanitized in SQL query',
-            recommendation: 'Use parameterized queries or prepared statements',
-          },
-          {
-            id: 'VULN_002',
-            type: 'XSS Vulnerability',
-            severity: 'high',
-            file: 'src/components/Form.jsx',
-            line: 120,
-            description: 'Unsanitized user input rendered directly in DOM',
-            recommendation: 'Use React built-in escaping or DOMPurify',
-          },
-          {
-            id: 'VULN_003',
-            type: 'Hardcoded Credentials',
-            severity: 'critical',
-            file: 'src/config/database.js',
-            line: 8,
-            description: 'Database credentials hardcoded in source',
-            recommendation: 'Use environment variables for sensitive data',
-          },
-          {
-            id: 'VULN_004',
-            type: 'Missing CSRF Protection',
-            severity: 'high',
-            file: 'src/middleware/auth.js',
-            line: 35,
-            description: 'No CSRF token validation on state-changing requests',
-            recommendation: 'Implement CSRF tokens for forms',
-          },
-          {
-            id: 'VULN_005',
-            type: 'Weak Password Policy',
-            severity: 'medium',
-            file: 'src/validators/password.js',
-            line: 12,
-            description: 'Password validation allows weak passwords',
-            recommendation: 'Enforce minimum 12 characters with mixed case',
-          },
-          {
-            id: 'VULN_006',
-            type: 'Outdated Dependencies',
-            severity: 'medium',
-            file: 'package.json',
-            line: 1,
-            description: 'Several npm packages have known vulnerabilities',
-            recommendation: 'Run npm audit and update vulnerable packages',
-          },
-          {
-            id: 'VULN_007',
-            type: 'Missing Content-Security-Policy',
-            severity: 'low',
-            file: 'src/server.js',
-            line: 22,
-            description: 'CSP header not configured',
-            recommendation: 'Add Content-Security-Policy HTTP header',
-          },
-        ];
+        const repoSeed = this.hashString(`${repoInfo.owner}/${repoInfo.repo}`);
+        const countFor = (offset, min, max) => min + ((repoSeed + offset) % (max - min + 1));
 
         const summary = {
-          critical: 2,
-          high: 2,
-          medium: 2,
-          low: 1,
-          info: 0,
+          critical: countFor(11, 0, 3),
+          high: countFor(23, 0, 4),
+          medium: countFor(37, 0, 5),
+          low: countFor(53, 0, 4),
+          info: countFor(67, 0, 2),
         };
+
+        const severityTemplates = {
+          critical: [
+            {
+              type: 'SQL Injection',
+              description: 'User input is being interpolated directly into a database query.',
+              recommendation: 'Use parameterized queries or a safe ORM.',
+            },
+            {
+              type: 'Remote Code Execution',
+              description: 'Untrusted data is used when executing system commands.',
+              recommendation: 'Validate and sanitize all command inputs.',
+            },
+          ],
+          high: [
+            {
+              type: 'Cross-Site Scripting',
+              description: 'Unescaped user content is rendered inside the page.',
+              recommendation: 'Escape output and use a secure template engine.',
+            },
+            {
+              type: 'Broken Authentication',
+              description: 'Session or authentication data is not enforced correctly.',
+              recommendation: 'Use secure cookies and rotate authentication tokens.',
+            },
+          ],
+          medium: [
+            {
+              type: 'Weak Password Policy',
+              description: 'The password policy allows weak passwords.',
+              recommendation: 'Require longer passwords with mixed character types.',
+            },
+            {
+              type: 'Outdated Dependency',
+              description: 'A dependency has a known security vulnerability.',
+              recommendation: 'Update the dependency to the latest secure version.',
+            },
+          ],
+          low: [
+            {
+              type: 'Missing Content Security Policy',
+              description: 'CSP headers are not configured for the application.',
+              recommendation: 'Add a Content-Security-Policy header.',
+            },
+            {
+              type: 'HTTP Compression Misconfiguration',
+              description: 'Compression headers are not optimized securely.',
+              recommendation: 'Configure gzip and Brotli securely.',
+            },
+          ],
+          info: [
+            {
+              type: 'Code Style Issue',
+              description: 'The repository contains inconsistent formatting.',
+              recommendation: 'Run a formatter and linting pass.',
+            },
+            {
+              type: 'Documentation Missing',
+              description: 'Some modules are missing inline documentation.',
+              recommendation: 'Add comments and README details for key components.',
+            },
+          ],
+        };
+
+        const vulnerabilities = [];
+        const addVulnerabilities = (severity, count) => {
+          const templates = severityTemplates[severity];
+          for (let i = 0; i < count; i += 1) {
+            const template = templates[i % templates.length];
+            vulnerabilities.push({
+              id: `VULN_${severity.toUpperCase()}_${i + 1}`,
+              type: template.type,
+              severity,
+              file: `src/${severity}/${repoInfo.repo}-${i + 1}.js`,
+              line: 20 + i * 8,
+              description: template.description,
+              recommendation: template.recommendation,
+            });
+          }
+        };
+
+        addVulnerabilities('critical', summary.critical);
+        addVulnerabilities('high', summary.high);
+        addVulnerabilities('medium', summary.medium);
+        addVulnerabilities('low', summary.low);
+        addVulnerabilities('info', summary.info);
+
+        const totalVulnerabilities = vulnerabilities.length;
 
         resolve({
           repository: repoInfo,
           scanDateTime: new Date().toISOString(),
-          totalVulnerabilities: vulnerabilities.length,
+          totalVulnerabilities,
           vulnerabilities,
           summary,
           codeQualityMetrics: {
-            maintainability: 65,
-            reliability: 72,
-            security: 45,
-            coverage: 68,
+            maintainability: 60 + (repoSeed % 21),
+            reliability: 55 + (repoSeed % 26),
+            security: 40 + (repoSeed % 31),
+            coverage: 50 + (repoSeed % 26),
           },
         });
       }, 2000); // Simulate 2-second scan
     });
+  }
+
+  hashString(value) {
+    let hash = 0;
+    for (let i = 0; i < value.length; i += 1) {
+      const char = value.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash |= 0;
+    }
+    return Math.abs(hash);
   }
 
   /**

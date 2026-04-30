@@ -5,8 +5,9 @@ import { Auth } from './pages/Auth';
 import { Dashboard } from './pages/Dashboard';
 import { Results } from './pages/Results';
 import { useAuth } from './hooks/useAuth';
+import { ThemeProvider } from './context/ThemeContext';
 
-function App() {
+function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { user, getCurrentUser, logout } = useAuth();
@@ -29,11 +30,11 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className="w-8 h-8 border-3 border-slate-200 border-t-slate-900 rounded-full"
+          className="w-8 h-8 border-3 border-slate-200 dark:border-slate-700 border-t-slate-900 dark:border-t-slate-300 rounded-full"
         />
       </div>
     );
@@ -83,6 +84,14 @@ function App() {
         <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>
     </Router>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 
